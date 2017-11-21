@@ -1,0 +1,20 @@
+{
+    "name": "naomi/printr",
+    "description": "API + Front-office + Back-office +  Showcase site for an online printer company (school project). Powered by Slim PHP and Javascript :rocket:",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Naomi Hauret",
+            "email": "hauretnaomi@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/api"
+        }
+    },
+    "require": {
+        "slim/slim": "^3.9"
+    }
+}

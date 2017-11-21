@@ -1,0 +1,40 @@
+{
+  "name": "printr",
+  "version": "1.0.0",
+  "description": "API + Front-office + Back-office +  Showcase site for an online printer company (school project). Powered by Slim PHP and Javascript :rocket:",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run launch:api ; npm run launch:front",
+    "launch:front": "webpack && webpack-dev-server",
+    "launch:api": "php -S localhost:3000"
+  },
+  "author": "Naomi Hauret",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "css-loader": "^0.28.7",
+    "html-webpack-plugin": "^2.30.1",
+    "normalize.css": "^7.0.0",
+    "postcss": "^6.0.14",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-easy-import": "^3.0.0",
+    "postcss-loader": "^2.0.8",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.19.0",
+    "twig-loader": "^0.3.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  },
+  "dependencies": {
+    "axios": "^0.17.0",
+    "babel-plugin-inferno": "^3.3.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-runtime": "^6.26.0",
+    "inferno": "^3.10.1",
+    "inferno-component": "^3.10.1",
+    "inferno-router": "^3.10.1"
+  }
+}

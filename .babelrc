@@ -1,0 +1,15 @@
+{
+    "presets": ["env"],
+    "plugins": [
+        "inferno",
+        [
+            "transform-runtime",
+            {
+                "helpers": false,
+                "polyfill": false,
+                "regenerator": true,
+                "moduleName": "runtime"
+            }
+        ]
+    ]
+}
