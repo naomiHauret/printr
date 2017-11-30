@@ -31,55 +31,74 @@
             $app->post('',  \App\Models\Users::class . ':add');
 
             $app->group('/{id}', function () use ($app){
+                $app->get('/orders', \App\Models\Users::class . ':getOrders')->setName('user')->setName('user');
+                $app->get('/cart', \App\Models\Users::class . ':getCart')->setName('user')->setName('user');
                 $app->get('', \App\Models\Users::class . ':getOne')->setName('user');
                 $app->put('', \App\Models\Users::class . ':update')->setName('user')->add($GLOBALS["checkIfOwner"]);
-                $app->delete('', \App\Models\Users::class . ':delete')->setName('user')->add($GLOBALS["checkIfAdminStatus"]);            
+                $app->delete('', \App\Models\Users::class . ':delete')->setName('user');            
             })->add($GLOBALS["checkIfAuthorized"]);
         });
 
-        $app->group('/client/{id}', function () use ($app){
-            $app->get('/orders', \App\Models\Users::class . ':getOrders')->setName('user');
-            $app->get('/cart', \App\Models\Users::class . ':getCart')->setName('user');
+        // - formats
+        $app->group('/formats', function () use ($app){
+            $app->get('', \App\Models\Formats::class . ':getAll');
+            $app->post('',  \App\Models\Formats::class . ':add')->add($GLOBALS["checkIfAdminStatus"]);  
+            $app->group('/{id}', function () use ($app){
+                $app->get('', \App\Models\Formats::class . ':getOne');
+                $app->put('', \App\Models\Formats::class . ':update');
+                $app->delete('', \App\Models\Formats::class . ':delete');            
+            })->add($GLOBALS["checkIfAdminStatus"]);
+        });
+
+        // - options
+        $app->group('/options', function () use ($app){
+            $app->get('', \App\Models\Options::class . ':getAll');
+            $app->post('',  \App\Models\Options::class . ':add')->add($GLOBALS["checkIfAdminStatus"]);  
+            $app->group('/{id}', function () use ($app){
+                $app->get('', \App\Models\Options::class . ':getOne');
+                $app->put('', \App\Models\Options::class . ':update');
+                $app->delete('', \App\Models\Options::class . ':delete');            
+            })->add($GLOBALS["checkIfAdminStatus"]);
+        });
+
+        // - prestations
+        $app->group('/prestations', function () use ($app){
+            $app->get('', \App\Models\Prestations::class . ':getAll')->add($GLOBALS["checkIfAdminStatus"]);
+            $app->post('',  \App\Models\Prestations::class . ':add');
+            $app->group('/{id}', function () use ($app){
+                $app->get('', \App\Models\Prestations::class . ':getOne');
+                $app->put('', \App\Models\Prestations::class . ':update');
+                $app->delete('', \App\Models\Prestations::class . ':delete');
+                $app->group('/options', function () use ($app){
+                    $app->post('', \App\Models\Prestations::class . ':addOption');
+                    $app->group('/{option_id}', function () use ($app){
+                        $app->put('', \App\Models\Prestations::class . ':updateOption');
+                        $app->post('', \App\Models\Prestations::class . ':deleteOption');
+                    });
+                });
+            })->add($GLOBALS["checkIfAuthorized"]);
+        })->add($GLOBALS["checkIfAuthentified"]);
+
+        // - carts
+        $app->group('/carts', function () use ($app){
+            $app->get('', \App\Models\Carts::class . ':getAll')->add($GLOBALS["checkIfAdminStatus"]);
+            $app->post('',  \App\Models\Carts::class . ':add');
+            $app->group('/{id}', function () use ($app){
+                $app->get('', \App\Models\Carts::class . ':getOne');
+                $app->put('', \App\Models\Carts::class . ':update');
+                $app->delete('', \App\Models\Carts::class . ':delete');
+            });
+        })->add($GLOBALS["checkIfAuthorized"]);
+
+                // - carts
+        $app->group('/orders', function () use ($app){
+            $app->get('', \App\Models\Orders::class . ':getAll')->add($GLOBALS["checkIfAdminStatus"]);
+            $app->post('',  \App\Models\Orders::class . ':add');
+            $app->group('/{id}', function () use ($app){
+                $app->get('', \App\Models\Orders::class . ':getOne');
+                $app->put('', \App\Models\Orders::class . ':update');
+                $app->delete('', \App\Models\Orders::class . ':delete');
+                $app->get('/prestations', \App\Models\Orders::class . ':getPrestations');
+            });
         })->add($GLOBALS["checkIfAuthorized"]);
     });
-
-
-    
-/*  
-    // -options
-    $app->get('/api/options', \App\Models\Options::class . ':getAll')->add($checkIfAuthentified);
-    $app->get('/api/options/{id}', \App\Models\Options::class . ':getOne')->add($checkIfAdminStatus);
-    $app->post('/api/options', \App\Models\Options::class . ':add')->add($checkIfAdminStatus);
-    $app->put('/api/options/{id}', \App\Models\Options::class . ':update')->add($checkIfAdminStatus);
-    $app->delete('/api/options/{id}', \App\Models\Options::class . ':delete')->add($checkIfAdminStatus);
-
-    // -prestations
-    $app->get('/api/prestations', \App\Models\Prestations::class . ':getAll')->add($checkIfAdminStatus);
-    $app->get('/api/prestations/{id}', \App\Models\Prestations::class . ':getOne')->add($checkIfAuthentified);
-    $app->post('/api/prestations', \App\Models\Prestations::class . ':add')->add($checkIfAuthentified);
-    $app->put('/api/prestations/{id}', \App\Models\Prestations::class . ':update')->add($checkIfAuthentified);
-    $app->delete('/api/prestations/{id}', \App\Models\Prestations::class . ':delete')->add($checkIfAuthentified);
-
-    // -carts
-    $app->get('/api/carts', \App\Models\Carts::class . ':getAll')->add($checkIfAdminStatus);
-    $app->get('/api/carts/{id}', \App\Models\Carts::class . ':getOne')->add($checkIfAuthorized);
-    $app->get('/api/carts/{id}/prestations', \App\Models\Carts::class . ':getPrestations')->add($checkIfAuthorized);
-    $app->post('/api/carts', \App\Models\Carts::class . ':add')->add($checkIfOwner);
-    $app->put('/api/carts/{id}', \App\Models\Carts::class . ':update')->add($checkIfOwner);
-    $app->delete('/api/carts/{id}', \App\Models\Carts::class . ':delete')->add($checkIfOwner);
-
-    // -orders
-    $app->get('/api/orders', \App\Models\Orders::class . ':getAll')->add($checkIfAdminStatus);
-    $app->get('/api/orders/{id}', \App\Models\Orders::class . ':getOne')->add($checkIfAuthorized);
-    $app->get('/api/orders/{id}/prestations', \App\Models\Orders::class . ':getPrestations')->add($checkIfAuthorized);
-    $app->post('/api/orders', \App\Models\Orders::class . ':add')->add($checkIfAuthentified);
-    $app->put('/api/orders/{id}', \App\Models\Orders::class . ':update')->add($checkIfAuthentified);
-    $app->delete('/api/orders/{id}', \App\Models\Orders::class . ':delete')->add($checkIfAuthentified);
-
-    $app->get('/api/disconnect', function($request, $response) {
-        session_destroy();
-        return $response->withStatus(200)
-                    ->withHeader('Content-Type', 'application/json')
-                    ->write(json_encode($_SESSION));
-    });
- */

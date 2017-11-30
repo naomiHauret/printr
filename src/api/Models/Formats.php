@@ -5,22 +5,22 @@
     use BaseModel\BaseModel;
     use BaseModel\ResourcesNotFoundException;
 
-    class Options extends BaseModel {
+    class Formats extends BaseModel {
 
         //
-        // Get all options
+        // Get all formats
         //     
         public function getAll($request, $response) {
             try {
                 $statement = $this->db->prepare(
                 "
                     SELECT * 
-                    FROM options
+                    FROM formats
                 "
                 );
                 $statement->execute();
-                $options = $statement->fetchAll();
-                $data= array_merge(["options"=> $options], $_SESSION);
+                $formats = $statement->fetchAll();
+                $data= array_merge(["formats"=> $formats], $_SESSION);
                 $result= $this->response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
                 ->write(json_encode($data));
@@ -29,7 +29,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: options could not be fetched."
+                        "message" => "Bad request: formats could not be fetched."
                     ]
                 ];
 
@@ -43,26 +43,26 @@
         }
 
         //
-        // Get one option with given id
+        // Get one format with given id
         //     
         public function getOne($request, $response) {
-            $option_id= $request->getAttribute("id");
+            $format_id= $request->getAttribute("id");
 
             try {
                 $statement = $this->db->prepare(
                 "
                     SELECT * 
-                    FROM options
+                    FROM formats
                     WHERE _id = :_id
                 "
                 );
                 $statement->execute(array(
-                    ":_id" =>  $option_id
+                    ":_id" =>  $format_id
                 ));
-                $option = $statement->fetch();
+                $format = $statement->fetch();
 
-                if ($option) {
-                    $data= array_merge(["options"=> [$option]], $_SESSION);
+                if ($format) {
+                    $data= array_merge(["formats"=> [$format]], $_SESSION);
                     $result = $this->response->withStatus(200)
                     ->withHeader("Content-Type", "application/json")
                     ->write(json_encode($data));
@@ -73,7 +73,7 @@
             catch(ResourcesNotFoundException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Option not found"
+                        "message" => "Format not found"
                     ]
                 ];
 
@@ -86,7 +86,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: option could not be fetched due to an invalid parameter."
+                        "message" => "Bad request: format could not be fetched due to an invalid parameter."
                     ]
                 ];
 
@@ -100,34 +100,31 @@
         }
 
         //
-        // Add one option
+        // Add one format
         //     
         public function add($request, $response) {
             try {
                 $statement = $this->db->prepare(
                 "
-                    INSERT INTO options(
-                        option_name,
-                        option_price,
-                        option_category,
-                        option_isAvailable
+                    INSERT INTO formats(
+                        format_name,
+                        format_price,
+                        format_dimensions
                     )
                     VALUES(
-                        :option_name,
-                        :option_price,
-                        :option_category,
-                        :option_isAvailable
+                        :format_name,
+                        :format_price,
+                        :format_dimensions
                     )
                 "
                 );
                  $queryResult = $statement->execute(array(
-                    ":option_name" => $request->getParam("option_name"),
-                    ":option_price" => $request->getParam("option_price"),
-                    ":option_category" => $request->getParam("option_category"),
-                    ":option_isAvailable" => $request->getParam("option_isAvailable")
+                    ":format_name" => $request->getParam("format_name"),
+                    ":format_price" => $request->getParam("format_price"),
+                    ":format_dimensions" => $request->getParam("format_dimensions")
                 ));
 
-                $data= array_merge(["added"=> $queryResult], $_SESSION);
+                $data= array_merge(["inserted"=> $queryResult], $_SESSION);
                 $result = $this->response->withStatus(201)
                 ->withHeader("Content-Type", "application/json")
                 ->write(json_encode($data));
@@ -136,7 +133,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: option could not be added due to missing or invalid parameters."
+                        "message" => "Bad request: format could not be added due to missing or invalid parameters."
                     ]
                 ];
 
@@ -151,44 +148,42 @@
         }
 
         //
-        // Update one option with given id
+        // Update one format with given id
         //     
         public function update($request, $response) {
-            $option_id= $request->getAttribute("id");
+            $format_id= $request->getAttribute("id");
 
             try {
                 $statement = $this->db->prepare(
                 "
                     SELECT * 
-                    FROM options
+                    FROM formats
                     WHERE _id = :_id
                 "
                 );
                 $statement->execute(array(
-                    ":_id" => $option_id
+                    ":_id" => $format_id
                 ));
-                $option = $statement->fetch();
+                $format = $statement->fetch();
 
-                if ($option) {
+                if ($format) {
                     $query=  $this->db->prepare(
                     "   
-                        UPDATE options 
+                        UPDATE formats 
                         SET 
-                                option_name = :option_name,
-                                option_price = :option_price,
-                                option_category = :option_category,
-                                option_isAvailable = :option_isAvailable
+                                format_name = :format_name,
+                                format_price = :format_price,
+                                format_dimensions = :format_dimensions
                         WHERE _id = :_id
                     ");
                     $queryResult= $query->execute(array(
-                        "option_name" => $request->getParam("option_name") ,
-                        "option_price" => $request->getParam("option_price"),
-                        "option_category" => $request->getParam("option_category"),
-                        "option_isAvailable" => $request->getParam("option_isAvailable"),
-                        "_id" => $option_id
+                        "format_name" => $request->getParam("format_name") ,
+                        "format_price" => $request->getParam("format_price"),
+                        "format_dimensions" => $request->getParam("format_dimensions"),
+                        "_id" => $format_id
                     ));
 
-                    $data= array_merge(["updated"=> $queryResult], $_SESSION);
+                    $data= array_merge([$queryResult], $_SESSION);
                     $result = $this->response->withStatus(200)
                     ->withHeader("Content-Type", "application/json")
                     ->write(json_encode($data));
@@ -199,7 +194,7 @@
             catch(ResourcesNotFoundException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Option not found"
+                        "message" => "Format not found"
                     ]
                 ];
 
@@ -212,7 +207,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: option could not be updated due to missing or invalid parameters."
+                        "message" => "Bad request: format could not be updated due to missing or invalid parameters."
                     ]
                 ];
 
@@ -226,34 +221,34 @@
         }
 
         //
-        // Delete one option with given id
+        // Delete one format with given id
         //     
         public function delete($request, $response) {
-            $option_id= $request->getAttribute("id");
+            $format_id= $request->getAttribute("id");
             try {
                 $statement = $this->db->prepare(
                 "
                     SELECT * 
-                    FROM options
+                    FROM formats
                     WHERE _id = :_id
                 "
                 );
                 $statement->execute(array(
-                    ":_id" => $option_id
+                    ":_id" => $format_id
                 ));
-                $option = $statement->fetch();
+                $format = $statement->fetch();
 
-                if ($option) {
+                if ($format) {
                     $statement = $this->db->prepare(
                     "
-                        DELETE FROM options WHERE _id = :_id
+                        DELETE FROM formats WHERE _id = :_id
                     "
                     );
                     $queryResult = $statement->execute(array(
-                        ":_id" => $option_id
+                        ":_id" => $format_id
                     ));
 
-                    $data= array_merge(["deleted"=> $queryResult], $_SESSION);
+                    $data= array_merge([$queryResult], $_SESSION);
                     $result = $this->response->withStatus(204)
                     ->withHeader("Content-Type", "application/json")
                     ->write(json_encode($data));
@@ -264,7 +259,7 @@
             catch(ResourcesNotFoundException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Option not found"
+                        "message" => "Format not found"
                     ]
                 ];
 
@@ -277,7 +272,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: option could not be deleted due to invalid parameter."
+                        "message" => "Bad request: format could not be deleted due to invalid parameter."
                     ]
                 ];
 

@@ -19,7 +19,7 @@
 
     $checkIfAuthentified= function($request, $response, $next ) {
         try {
-            if($_SESSION['is_loggedIn'] == true) {
+            if($_SESSION["current_user"]["is_loggedIn"] == true) {
                 $result = $next($request, $response);
             }
             else {
@@ -34,24 +34,24 @@
              ];
              $data= array_merge($error, $_SESSION);
              $result = $response->withStatus(401)
-             ->withHeader('Content-Type', 'application/json')
+             ->withHeader("Content-Type", "application/json")
              ->write(json_encode($data));
             }
         return $result;
     };
 
     $checkIfAuthorized= function($request, $response, $next ) {
-        try {
-                $route = $request->getAttribute('route');
-                $routeName = $route->getName();
-                $currentUserId = $_SESSION["currentUser_id"];
-                if($routeName == "user") {
-                    $idUserRequest = $route->getArguments()['id'];
-                } else {
-                    $idUserRequest = $request->getParam('user');
-                }
+        $route = $request->getAttribute("route");
+        $routeName = $route->getName();
+        $currentUserId = $_SESSION["current_user"]["id"];
+        if($routeName == "user") {
+            $idUserRequest = $route->getArguments()["id"];
+        } else {
+            $idUserRequest = $request->getParam("user");
+        }
                     
-                if($currentUserId == $idUserRequest || $_SESSION['is_admin'] == true) {
+        try {
+                if(($currentUserId == $idUserRequest) || ($_SESSION["current_user"]["is_admin"] == true)) {
                     $result = $next($request, $response);
                 }
                 else {
@@ -66,7 +66,7 @@
             ];
             $data= array_merge($error, $_SESSION);
             $result = $response->withStatus(403)
-            ->withHeader('Content-Type', 'application/json')
+            ->withHeader("Content-Type", "application/json")
             ->write(json_encode($data));
             }
 
@@ -75,7 +75,7 @@
 
     $checkIfAdminStatus= function($request, $response, $next ) {
         try {
-            if($_SESSION['is_admin'] == true) {
+            if($_SESSION["current_user"]["is_admin"] == true) {
                 $result = $next($request, $response);
             }
             else {
@@ -90,7 +90,7 @@
              ];
              $data= array_merge($error, $_SESSION);
              $result = $response->withStatus(403)
-             ->withHeader('Content-Type', 'application/json')
+             ->withHeader("Content-Type", "application/json")
              ->write(json_encode($data));
          }
 
@@ -100,13 +100,13 @@
 
     $checkIfOwner= function($request, $response, $next ) {
         try {
-                $route = $request->getAttribute('route');
+                $route = $request->getAttribute("route");
                 $routeName = $route->getName();
-                $currentUserId = $_SESSION["currentUser_id"];
+                $currentUserId = $_SESSION["current_user"]["id"];
                 if($routeName == "user") {
-                    $idUserRequest = $route->getArguments()['id'];
+                    $idUserRequest = $route->getArguments()["id"];
                 } else {
-                    $idUserRequest = $request->getParam('user');
+                    $idUserRequest = $request->getParam("user");
                 }
                     
                 if($currentUserId == $idUserRequest) {
@@ -124,7 +124,7 @@
             ];
             $data= array_merge($error, $_SESSION);
             $result = $response->withStatus(403)
-            ->withHeader('Content-Type', 'application/json')
+            ->withHeader("Content-Type", "application/json")
             ->write(json_encode($data));
             }
 
