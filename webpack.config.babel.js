@@ -1,5 +1,5 @@
-const path = require("path")
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+import path from "path"
+import HtmlWebpackPlugin from 'html-webpack-plugin'
 
 const exludedFolders = [
   path.join(__dirname, "node_modules"),
@@ -12,7 +12,6 @@ module.exports = {
     filename: "assets/scripts/bundle.js",
     path: path.resolve(__dirname, "dist")
   },
-  devtool: "eval-source-map",
   devServer: {
     contentBase: path.join(__dirname, "dist"),
     compress: true,
@@ -26,19 +25,13 @@ module.exports = {
             test: /\.js$/,
             exclude: exludedFolders,
             use: "babel-loader",
-        },
-        {
-            test: /\.twig$/,
-            exclude: exludedFolders,
-            use: "twig-loader",
         }
       ]
   },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./app/front/index.html.twig",
+            template: "./src/front/index.html",
             filename: "index.html",
         })
     ],
-
 }

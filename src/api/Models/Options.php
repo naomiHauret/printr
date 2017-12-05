@@ -13,10 +13,10 @@
         public function getAll($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM options
-                "
+                    "
+                        SELECT * 
+                        FROM options
+                    "
                 );
                 $statement->execute();
                 $options = $statement->fetchAll();
@@ -50,11 +50,11 @@
 
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM options
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM options
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" =>  $option_id
@@ -105,20 +105,20 @@
         public function add($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    INSERT INTO options(
-                        option_name,
-                        option_price,
-                        option_category,
-                        option_isAvailable
-                    )
-                    VALUES(
-                        :option_name,
-                        :option_price,
-                        :option_category,
-                        :option_isAvailable
-                    )
-                "
+                    "
+                        INSERT INTO options(
+                            option_name,
+                            option_price,
+                            option_category,
+                            option_isAvailable
+                        )
+                        VALUES(
+                            :option_name,
+                            :option_price,
+                            :option_category,
+                            :option_isAvailable
+                        )
+                    "
                 );
                  $queryResult = $statement->execute(array(
                     ":option_name" => $request->getParam("option_name"),
@@ -158,11 +158,11 @@
 
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM options
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM options
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $option_id
@@ -171,15 +171,16 @@
 
                 if ($option) {
                     $query=  $this->db->prepare(
-                    "   
-                        UPDATE options 
-                        SET 
-                                option_name = :option_name,
-                                option_price = :option_price,
-                                option_category = :option_category,
-                                option_isAvailable = :option_isAvailable
-                        WHERE _id = :_id
-                    ");
+                        "   
+                            UPDATE options 
+                            SET 
+                                    option_name = :option_name,
+                                    option_price = :option_price,
+                                    option_category = :option_category,
+                                    option_isAvailable = :option_isAvailable
+                            WHERE _id = :_id
+                        "
+                    );
                     $queryResult= $query->execute(array(
                         "option_name" => $request->getParam("option_name") ,
                         "option_price" => $request->getParam("option_price"),
@@ -232,11 +233,11 @@
             $option_id= $request->getAttribute("id");
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM options
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM options
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $option_id
@@ -245,9 +246,10 @@
 
                 if ($option) {
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM options WHERE _id = :_id
-                    "
+                        "
+                            DELETE FROM options
+                            WHERE _id = :_id
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":_id" => $option_id

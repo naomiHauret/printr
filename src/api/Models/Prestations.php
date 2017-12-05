@@ -10,14 +10,58 @@
         //
         public function getAll($request, $response) {
             try {
+                // get prestations
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM prestations
-                "
+                    "
+                        SELECT
+                            prestations._id,
+                            prestations.prestation_cartId,
+                            prestations.prestation_formatId,
+                            prestations.prestation_filePath,
+                            prestations.prestation_quantity,
+                            formats.format_name,
+                            formats.format_dimensions,
+                            formats.format_iconPath,
+                            formats.format_price AS prestation_base_price,
+                            SUM(options.option_price) AS prestation_total_options,
+                            formats.format_price + SUM(options.option_price) AS prestation_unit_total_taxfree,
+                            (formats.format_price + SUM(options.option_price)) * 1.10  AS prestation_unit_total_withtaxes,
+                            (formats.format_price + SUM(options.option_price)) * prestations.prestation_quantity AS prestation_total_taxfree,
+                            ((formats.format_price + SUM(options.option_price)) * prestations.prestation_quantity) * 1.10 AS prestation_total_withtaxes
+                        FROM prestations INNER JOIN formats
+                        ON prestations.prestation_formatId = formats._id
+                        INNER JOIN prestation_options
+                        ON prestation_options.prestation_id = prestations._id
+                        INNER JOIN options
+                        ON prestation_options.option_id = options._id
+                        GROUP BY prestations._id
+                    "
                 );
                 $statement->execute();
                 $prestations = $statement->fetchAll();
+
+                // for each prestations, get chosen options
+                for ($k = 0; $k < count($prestations); $k++) {
+                    $prestation_id= $prestations[$k]["_id"];
+                    $statement = $this->db->prepare(
+                        "
+                            SELECT
+                                option_name,
+                                option_price,
+                                option_category,
+                                prestation_options._id AS prestation_option_id
+                            FROM options INNER JOIN prestation_options
+                            ON prestation_options.option_id = options._id
+                            WHERE prestation_options.prestation_id = :prestation_id
+                        "
+                    );
+                    $statement->execute(array(
+                        ":prestation_id" => $prestation_id
+                    ));
+                    $prestationsOptions= $statement->fetchAll();
+                    $prestations[$k]= ["info" => $prestations[$k], "options"=> $prestationsOptions];
+                }
+
                 $data= array_merge(["prestations" => $prestations], $_SESSION);
                 $result= $this->response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
@@ -27,7 +71,7 @@
             catch(PDOException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Bad request: prestations could not be fetched."
+                        "message" => "Bad request: carts could not be fetched."
                     ]
                 ];
 
@@ -48,11 +92,30 @@
             try {
                 // check if prestation exists
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM prestations
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT
+                            prestations._id,
+                            prestations.prestation_cartId,
+                            prestations.prestation_formatId,
+                            prestations.prestation_filePath,
+                            prestations.prestation_quantity,
+                            formats.format_name,
+                            formats.format_dimensions,
+                            formats.format_iconPath,
+                            formats.format_price AS prestation_base_price,
+                            SUM(options.option_price) AS prestation_total_options,
+                            formats.format_price + SUM(options.option_price) AS prestation_unit_total_taxfree,
+                            (formats.format_price + SUM(options.option_price)) * 1.10  AS prestation_unit_total_withtaxes,
+                            (formats.format_price + SUM(options.option_price)) * prestations.prestation_quantity AS prestation_total_taxfree,
+                            ((formats.format_price + SUM(options.option_price)) * prestations.prestation_quantity) * 1.10 AS prestation_total_withtaxes
+                        FROM prestations INNER JOIN formats
+                        ON prestations.prestation_formatId = formats._id
+                        INNER JOIN prestation_options
+                        ON prestation_options.prestation_id = prestations._id
+                        INNER JOIN options
+                        ON prestation_options.option_id = options._id
+                        WHERE prestations._id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $prestation_id
@@ -375,16 +438,14 @@
                         prestation_formatId,
                         prestation_iconPath,
                         prestation_filePath,
-                        prestation_quantity,
-                        prestation_isAvailable 
+                        prestation_quantity
                     )
                     VALUES(
                         :prestation_cartId,
                         :prestation_formatId,
                         :prestation_iconPath,
                         :prestation_filePath,
-                        :prestation_quantity,
-                        :prestation_isAvailable 
+                        :prestation_quantity
                     )
                 "
                 );
@@ -447,18 +508,14 @@
                         UPDATE prestations 
                         SET 
                                 prestation_formatId = :prestation_formatId,
-                                prestation_iconPath = :prestation_iconPath,
                                 prestation_filePath = :prestation_filePath,
-                                prestation_quantity = :prestation_quantity,
-                                prestation_isAvailable = :prestation_isAvailable                                
+                                prestation_quantity = :prestation_quantity
                         WHERE _id = :_id
                     ");
                     $queryResult= $query->execute(array(
                         "prestation_formatId" => $request->getParam("prestation_formatId"),
-                        "prestation_iconPath" => $request->getParam("prestation_iconPath"),
                         "prestation_filePath" => $request->getParam("prestation_filePath"),
                         "prestation_quantity" => $request->getParam("prestation_quantity"),
-                        "prestation_isAvailable" => $request->getParam("prestation_isAvailable"),
                         "_id" => $prestation_id
                     ));
 
@@ -525,7 +582,8 @@
                     // delete related options
                     $statement = $this->db->prepare(
                         "
-                            DELETE FROM prestations_options WHERE prestation_id = :prestation_id
+                            DELETE FROM prestations_options
+                            WHERE prestation_id = :prestation_id
                         "
                     );
                     $queryResult = $statement->execute(array(

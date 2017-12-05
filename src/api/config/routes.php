@@ -32,6 +32,7 @@
 
             $app->group('/{id}', function () use ($app){
                 $app->get('/orders', \App\Models\Users::class . ':getOrders')->setName('user')->setName('user');
+                $app->get('/carts', \App\Models\Users::class . ':getCarts')->setName('user')->setName('user')->add($GLOBALS["checkIfAdminStatus"]);
                 $app->get('/cart', \App\Models\Users::class . ':getCart')->setName('user')->setName('user');
                 $app->get('', \App\Models\Users::class . ':getOne')->setName('user');
                 $app->put('', \App\Models\Users::class . ':update')->setName('user')->add($GLOBALS["checkIfOwner"]);
@@ -90,7 +91,7 @@
             });
         })->add($GLOBALS["checkIfAuthorized"]);
 
-                // - carts
+        // - orders
         $app->group('/orders', function () use ($app){
             $app->get('', \App\Models\Orders::class . ':getAll')->add($GLOBALS["checkIfAdminStatus"]);
             $app->post('',  \App\Models\Orders::class . ':add');

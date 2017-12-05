@@ -1,7 +1,7 @@
 <?php
     namespace BaseModel;
     use Exception;
-
+    
     class BaseModel {
 
         public function __construct($container) {

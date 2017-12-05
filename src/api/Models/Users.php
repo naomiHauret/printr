@@ -12,11 +12,11 @@
         public function getAll($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM users
-                    ORDER BY user_lastname
-                "
+                    "
+                        SELECT * 
+                        FROM users
+                        ORDER BY user_lastname
+                    "
                 );
                 $statement->execute();
                 $users =[ "users" => $statement->fetchAll()];
@@ -49,12 +49,12 @@
         public function verifyAccount($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM users
-                    USERS WHERE user_email = :user_email 
-                    AND user_password = :user_password
-                "
+                    "
+                        SELECT * 
+                        FROM users
+                        USERS WHERE user_email = :user_email 
+                        AND user_password = :user_password
+                    "
                 );
                 $statement->execute(array(
                     ":user_email" => $request->getParam("user_email"),
@@ -65,12 +65,12 @@
                     if($user["user_isClient"] == 1) {
                         // check if user has cart
                         $statement = $this->db->prepare(
-                        "
-                            SELECT * 
-                            FROM carts
-                            WHERE cart_userId = :cart_userId
-                            AND cart_isOrdered = :cart_isOrdered
-                        "
+                            "
+                                SELECT * 
+                                FROM carts
+                                WHERE cart_userId = :cart_userId
+                                AND cart_isOrdered = :cart_isOrdered
+                            "
                         );
                         $statement->execute(array(
                             ":cart_userId" =>  $user["_id"],
@@ -80,16 +80,16 @@
 
                         if(!$cart) {
                             $statement = $this->db->prepare(
-                            "
-                                INSERT INTO carts(
-                                    cart_userId,
-                                    cart_isOrdered
-                                )
-                                VALUES(
-                                    :cart_userId,
-                                    :cart_isOrdered
-                                )
-                            "
+                                "
+                                    INSERT INTO carts(
+                                        cart_userId,
+                                        cart_isOrdered
+                                    )
+                                    VALUES(
+                                        :cart_userId,
+                                        :cart_isOrdered
+                                    )
+                                "
                             );
                             $queryResult = $statement->execute(array(
                                 ":cart_userId" => $user["_id"],
@@ -211,24 +211,24 @@
         public function add($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    INSERT INTO users(
-                        user_firstname,
-                        user_lastname,
-                        user_email,
-                        user_password,
-                        user_address,
-                        user_isClient
-                    )
-                    VALUES (
-                        :user_firstname,
-                        :user_lastname,
-                        :user_email,
-                        :user_password,
-                        :user_address,
-                        :user_isClient
-                    )
-                "
+                    "
+                        INSERT INTO users(
+                            user_firstname,
+                            user_lastname,
+                            user_email,
+                            user_password,
+                            user_address,
+                            user_isClient
+                        )
+                        VALUES (
+                            :user_firstname,
+                            :user_lastname,
+                            :user_email,
+                            :user_password,
+                            :user_address,
+                            :user_isClient
+                        )
+                    "
                 );
                  $queryResult = $statement->execute(array(
                     ":user_firstname" => $request->getParam("user_firstname"),
@@ -267,11 +267,11 @@
         public function update($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM users
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM users
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $request->getAttribute("id")
@@ -280,17 +280,18 @@
 
                 if ($user) {
                     $query=  $this->db->prepare(
-                    "   
-                        UPDATE users 
-                        SET 
-                                user_firstname = :user_firstname,
-                                user_lastname = :user_lastname,
-                                user_email = :user_email,
-                                user_password = :user_password,
-                                user_address = :user_address,
-                                user_isClient = :user_isClient  
-                        WHERE _id = :_id
-                    ");
+                        "   
+                            UPDATE users 
+                            SET 
+                                    user_firstname = :user_firstname,
+                                    user_lastname = :user_lastname,
+                                    user_email = :user_email,
+                                    user_password = :user_password,
+                                    user_address = :user_address,
+                                    user_isClient = :user_isClient  
+                            WHERE _id = :_id
+                        "
+                    );
                     $queryResult= $query->execute(array(
                         "user_firstname" => $request->getParam("user_firstname") ,
                         "user_lastname" => $request->getParam("user_lastname"),
@@ -361,17 +362,19 @@
 
                 if ($user) {
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM carts WHERE cart_userId = :cart_userId
-                    "
+                        "
+                            DELETE FROM carts
+                            WHERE cart_userId = :cart_userId
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":cart_userId" => $user_id
                     ));
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM users WHERE _id = :_id
-                    "
+                        "
+                            DELETE FROM users
+                            WHERE _id = :_id
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":_id" => $user_id
@@ -416,8 +419,8 @@
         }
 
 
-                //
-        // Get car of user with given id
+        //
+        // Get cart of user with given id
         //     
         public function getCart($request, $response) {
             $user_id= $request->getAttribute("id");
@@ -453,9 +456,20 @@
                         $cart_id= $cart["_id"];
                         $statement = $this->db->prepare(
                             "
-                                SELECT *
+                                SELECT
+                                    prestations._id,
+                                    prestations.prestation_cartId,
+                                    prestations.prestation_formatId,
+                                    prestations.prestation_filePath,
+                                    prestations.prestation_quantity,
+                                    formats.format_name,
+                                    formats.format_dimensions,
+                                    formats.format_price,
+                                    formats.format_iconPath
                                 FROM prestations
-                                WHERE prestation_cartId = :prestation_cartId
+                                INNER JOIN formats
+                                ON prestations.prestation_formatId = formats._id
+                                WHERE prestations.prestation_cartId = :prestation_cartId
                             "
                         );
                         $statement->execute(array(
@@ -470,7 +484,11 @@
 
                                     $statement = $this->db->prepare(
                                         "
-                                            SELECT option_name, option_price, option_category, prestation_options._id AS prestation_option_id
+                                            SELECT
+                                                option_name,
+                                                option_price,
+                                                option_category,
+                                                prestation_options._id AS prestation_option_id
                                             FROM options INNER JOIN prestation_options
                                             ON prestation_options.option_id = options._id
                                             WHERE prestation_options.prestation_id = :prestation_id
@@ -531,4 +549,256 @@
             return $result;
         }
 
+        //
+        // - get all carts of user with given id
+        //
+        public function getCarts($request, $response) {
+            $user_id= $request->getAttribute("id");
+
+            try {
+                $statement = $this->db->prepare(
+                    "
+                        SELECT * 
+                        FROM users
+                        WHERE _id = :_id
+                    "
+                );
+                $statement->execute(array(
+                    ":_id" => $user_id
+                ));
+                $user = $statement->fetch();
+
+                if ($user) {
+                    $statement = $this->db->prepare(
+                        "
+                            SELECT * 
+                            FROM carts
+                            WHERE cart_userId = :cart_userId
+                        "
+                    );
+                    $statement->execute(array(
+                        ":cart_userId" => $user_id
+                    ));
+
+                    $carts = $statement->fetchAll();
+
+                    for($i= 0; $i < count($carts); $i++) {
+                        // get related prestations
+                        $statement = $this->db->prepare(
+                            "
+                                SELECT
+                                    prestations._id,
+                                    prestations.prestation_cartId,
+                                    prestations.prestation_formatId,
+                                    prestations.prestation_filePath,
+                                    prestations.prestation_quantity,
+                                    formats.format_name,
+                                    formats.format_dimensions,
+                                    formats.format_price,
+                                    formats.format_iconPath
+                                FROM prestations
+                                INNER JOIN formats
+                                ON prestations.prestation_formatId = formats._id
+                                WHERE prestations.prestation_cartId = :prestation_cartId
+                            "
+                        );
+                        $statement->execute(array(
+                            ":prestation_cartId" => $carts[$i]["_id"]
+                        ));
+                        $prestations = $statement->fetchAll();
+
+                        // for each prestations, get chosen options
+                        for ($k = 0; $k < count($prestations); $k++) {
+                            $prestation_id= $prestations[$k]["_id"];
+
+                            $statement = $this->db->prepare(
+                                "
+                                    SELECT
+                                        option_name,
+                                        option_price,
+                                        option_category,
+                                        prestation_options._id AS prestation_option_id
+                                    FROM options INNER JOIN prestation_options
+                                    ON prestation_options.option_id = options._id
+                                    WHERE prestation_options.prestation_id = :prestation_id
+                                "
+                            );
+                            $statement->execute(array(
+                                ":prestation_id" => $prestation_id
+                            ));
+
+                            $prestationsOptions= $statement->fetchAll();
+                            $prestations[$k]= ["info" => $prestations[$k], "options"=> $prestationsOptions];
+                        }
+                        $carts[$i]= ["info" => $carts[$i], "prestations"=> $prestations];
+                    }
+
+                    $data= array_merge(["carts" => $carts], $_SESSION);
+                    $result= $this->response->withStatus(200)
+                    ->withHeader("Content-Type", "application/json")
+                    ->write(json_encode($data));
+
+                    } else {
+                        throw new ResourcesNotFoundException();
+                    }
+            }
+            catch(ResourcesNotFoundException $exception) {
+                $error = [
+                    "error" => [
+                        "message" => "Could not fetch cart for this user: user not found "
+                    ]
+                ];
+
+                $data= array_merge($error, $_SESSION);
+
+                $result = $this->response->withStatus(404)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            }
+            catch(PDOException $exception) {
+                $error = [
+                    "error" => [
+                        "message" => "Bad request: cart could not be fetched due to missing or invalid parameters."
+                    ]
+                ];
+
+                $data= array_merge($error, $_SESSION);
+
+                $result = $this->response->withStatus(400)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            }
+
+            return $result;
+        }
+
+        //
+        // - get all orders of user with given id
+        //
+        public function getOrders($request, $response) {
+            $user_id= $request->getAttribute("id");
+
+            try {
+                $statement = $this->db->prepare(
+                    "
+                        SELECT * 
+                        FROM users
+                        WHERE _id = :_id
+                    "
+                );
+                $statement->execute(array(
+                    ":_id" => $user_id
+                ));
+                $user = $statement->fetch();
+
+                if ($user) {
+                    $statement = $this->db->prepare(
+                        "
+                            SELECT
+                                orders._id,
+                                orders.order_userId,
+                                orders.order_cartId,
+                                orders.order_date,
+                                orders.order_dateDelivery,
+                                orders.order_deliveryAddress,
+                                orders.order_status
+                            FROM carts INNER JOIN orders
+                            ON carts._id = orders.order_cartId
+                            WHERE orders.order_userId = :order_userId
+                        "
+                    );
+                    $statement->execute(array(
+                        ":order_userId" => $user_id
+                    ));
+                    $orders = $statement->fetchAll();
+
+                    for($i= 0; $i < count($orders); $i++) {
+                        // get related prestations
+                        $statement = $this->db->prepare(
+                            "
+                                SELECT
+                                    prestations._id,
+                                    prestations.prestation_cartId,
+                                    prestations.prestation_formatId,
+                                    prestations.prestation_filePath,
+                                    prestations.prestation_quantity,
+                                    formats.format_name,
+                                    formats.format_dimensions,
+                                    formats.format_price,
+                                    formats.format_iconPath
+                                FROM prestations
+                                INNER JOIN formats
+                                ON prestations.prestation_formatId = formats._id
+                                WHERE prestations.prestation_cartId = :prestation_cartId
+                            "
+                        );
+                        $statement->execute(array(
+                            ":prestation_cartId" => $orders[$i]["order_cartId"]
+                        ));
+                        $prestations = $statement->fetchAll();
+
+                        // for each prestations, get chosen options
+                        for ($k = 0; $k < count($prestations); $k++) {
+                            $prestation_id= $prestations[$k]["_id"];
+
+                            $statement = $this->db->prepare(
+                                "
+                                    SELECT
+                                        option_name,
+                                        option_price,
+                                        option_category,
+                                        prestation_options._id AS prestation_option_id
+                                    FROM options INNER JOIN prestation_options
+                                    ON prestation_options.option_id = options._id
+                                    WHERE prestation_options.prestation_id = :prestation_id
+                                "
+                            );
+                            $statement->execute(array(
+                                ":prestation_id" => $prestation_id
+                            ));
+
+                            $prestationsOptions= $statement->fetchAll();
+                            $prestations[$k]= ["info" => $prestations[$k], "options"=> $prestationsOptions];
+                        }
+                        $orders[$i]= ["info" => $orders[$i], "prestations"=> $prestations];
+                    }
+
+                    $data= array_merge(["orders" => $orders], $_SESSION);
+                    $result= $this->response->withStatus(200)
+                    ->withHeader("Content-Type", "application/json")
+                    ->write(json_encode($data));
+
+                    } else {
+                        throw new ResourcesNotFoundException();
+                    }
+            }
+            catch(ResourcesNotFoundException $exception) {
+                $error = [
+                    "error" => [
+                        "message" => "Could not fetch orders for this user: user not found "
+                    ]
+                ];
+
+                $data= array_merge($error, $_SESSION);
+
+                $result = $this->response->withStatus(404)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            }
+            catch(PDOException $exception) {
+                $error = [
+                    "error" => [
+                        "message" => "Bad request: cart could not be fetched due to missing or invalid parameters."
+                    ]
+                ];
+
+                $data= array_merge($error, $_SESSION);
+
+                $result = $this->response->withStatus(400)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            }
+
+            return $result;
+        }
     }

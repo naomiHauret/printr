@@ -13,10 +13,10 @@
         public function getAll($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM formats
-                "
+                    "
+                        SELECT * 
+                        FROM formats
+                    "
                 );
                 $statement->execute();
                 $formats = $statement->fetchAll();
@@ -50,11 +50,11 @@
 
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM formats
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM formats
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" =>  $format_id
@@ -105,21 +105,24 @@
         public function add($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    INSERT INTO formats(
-                        format_name,
-                        format_price,
-                        format_dimensions
-                    )
-                    VALUES(
-                        :format_name,
-                        :format_price,
-                        :format_dimensions
-                    )
-                "
+                    "
+                        INSERT INTO formats(
+                            format_name,
+                            format_price,
+                            format_iconPath,
+                            format_dimensions
+                        )
+                        VALUES(
+                            :format_name,
+                            :format_price,
+                            format_iconPath,
+                            :format_dimensions
+                        )
+                    "
                 );
                  $queryResult = $statement->execute(array(
                     ":format_name" => $request->getParam("format_name"),
+                    ":format_iconPath" => $request->getParam("format_iconPath"),
                     ":format_price" => $request->getParam("format_price"),
                     ":format_dimensions" => $request->getParam("format_dimensions")
                 ));
@@ -155,11 +158,11 @@
 
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM formats
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM formats
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $format_id
@@ -168,19 +171,22 @@
 
                 if ($format) {
                     $query=  $this->db->prepare(
-                    "   
-                        UPDATE formats 
-                        SET 
-                                format_name = :format_name,
-                                format_price = :format_price,
-                                format_dimensions = :format_dimensions
-                        WHERE _id = :_id
-                    ");
+                        "   
+                            UPDATE formats 
+                            SET 
+                                    format_name = :format_name,
+                                    format_price = :format_price,
+                                    format_iconPath = :format_iconPath,
+                                    format_dimensions = :format_dimensions
+                            WHERE _id = :_id
+                        "
+                    );
                     $queryResult= $query->execute(array(
-                        "format_name" => $request->getParam("format_name") ,
-                        "format_price" => $request->getParam("format_price"),
-                        "format_dimensions" => $request->getParam("format_dimensions"),
-                        "_id" => $format_id
+                        ":format_name" => $request->getParam("format_name") ,
+                        ":format_price" => $request->getParam("format_price"),
+                        ":format_iconPath" => $request->getParam("format_iconPath"),
+                        ":format_dimensions" => $request->getParam("format_dimensions"),
+                        ":_id" => $format_id
                     ));
 
                     $data= array_merge([$queryResult], $_SESSION);
@@ -227,11 +233,11 @@
             $format_id= $request->getAttribute("id");
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM formats
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM formats
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $format_id
@@ -240,9 +246,10 @@
 
                 if ($format) {
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM formats WHERE _id = :_id
-                    "
+                        "
+                            DELETE FROM formats
+                            WHERE _id = :_id
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":_id" => $format_id

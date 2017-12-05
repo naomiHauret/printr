@@ -6,14 +6,17 @@
     use BaseModel\ResourcesNotFoundException;
 
     class Carts extends BaseModel {
-
+        //
+        // Get all carts
+        //
         public function getAll($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM carts
-                "
+                    "
+                        SELECT * 
+                        FROM carts
+                        ORDER BY _id
+                    "
                 );
                 $statement->execute();
                 $carts = $statement->fetchAll();
@@ -21,11 +24,22 @@
                 for($i= 0; $i < count($carts); $i++) {
                     // get related prestations
                     $statement = $this->db->prepare(
-                    "
-                        SELECT * 
-                        FROM prestations
-                        WHERE prestation_cartId = :prestation_cartId
-                    "
+                        "
+                            SELECT
+                                prestations._id,
+                                prestations.prestation_cartId,
+                                prestations.prestation_formatId,
+                                prestations.prestation_filePath,
+                                prestations.prestation_quantity,
+                                formats.format_name,
+                                formats.format_dimensions,
+                                formats.format_price,
+                                formats.format_iconPath
+                            FROM prestations
+                            INNER JOIN formats
+                            ON prestations.prestation_formatId = formats._id
+                            WHERE prestations.prestation_cartId = :prestation_cartId
+                        "
                     );
                     $statement->execute(array(
                         ":prestation_cartId" => $carts[$i]["_id"]
@@ -38,7 +52,11 @@
 
                         $statement = $this->db->prepare(
                             "
-                                SELECT option_name, option_price, option_category, prestation_options._id AS prestation_option_id
+                                SELECT
+                                    option_name,
+                                    option_price,
+                                    option_category,
+                                    prestation_options._id AS prestation_option_id
                                 FROM options INNER JOIN prestation_options
                                 ON prestation_options.option_id = options._id
                                 WHERE prestation_options.prestation_id = :prestation_id
@@ -49,7 +67,7 @@
                         ));
 
                         $prestationsOptions= $statement->fetchAll();
-                        $prestations[$k]= ["info" => $prestations[$i], "options"=> $prestationsOptions];
+                        $prestations[$k]= ["info" => $prestations[$k], "options"=> $prestationsOptions];
                     }
                     $carts[$i]= ["info" => $carts[$i], "prestations"=> $prestations];
                 }
@@ -77,17 +95,20 @@
         }
 
 
+        //
+        // Get cart with given id
+        //
         public function getOne($request, $response) {
             $cart_id = $request->getAttribute("id");
 
             try {
                 // get cart
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM carts
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM carts
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $cart_id
@@ -99,11 +120,22 @@
 
                     // get related prestations
                     $statement = $this->db->prepare(
-                    "
-                        SELECT * 
-                        FROM prestations
-                        WHERE prestation_cartId = :prestation_cartId
-                    "
+                        "
+                            SELECT 
+                                prestations._id,
+                                prestations.prestation_cartId,
+                                prestations.prestation_formatId,
+                                prestations.prestation_filePath,
+                                prestations.prestation_quantity,
+                                formats.format_name,
+                                formats.format_dimensions,
+                                formats.format_iconPath,
+                                formats.format_price
+                            FROM prestations
+                            INNER JOIN formats
+                            ON prestations.prestation_formatId = formats._id
+                            WHERE prestations.prestation_cartId = :prestation_cartId
+                        "
                     );
                     $statement->execute(array(
                         ":prestation_cartId" => $cart_id
@@ -116,7 +148,10 @@
 
                         $statement = $this->db->prepare(
                             "
-                                SELECT option_name, option_price, option_category
+                                SELECT
+                                    option_name,
+                                    option_price,
+                                    option_category
                                 FROM options INNER JOIN prestation_options
                                 ON prestation_options.option_id = options._id
                                 WHERE prestation_options.prestation_id = :prestation_id
@@ -131,7 +166,7 @@
                     } 
 
 
-                    $data= array_merge(["carts" => ["info"=>$cart, "prestations"=>[$prestations]]], $_SESSION);
+                    $data= array_merge(["carts" => ["info"=>$cart, "prestations"=> $prestations]], $_SESSION);
                         $result = $this->response->withStatus(200)
                         ->withHeader("Content-Type", "application/json")
                         ->write(json_encode($data));
@@ -142,7 +177,7 @@
             catch(ResourcesNotFoundException $exception) {
                 $error = [
                     "error" => [
-                        "message" => "Cart not found not found"
+                        "message" => "Cart not found"
                     ]
                 ];
 
@@ -168,19 +203,22 @@
             return $result;
         }
 
+        //
+        // Add cart
+        //
         public function add($request, $response) {
             try {
                 $statement = $this->db->prepare(
-                "
-                    INSERT INTO carts(
-                        cart_userId,
-                        cart_isOrdered
-                    )
-                    VALUES(
-                        :cart_userId,
-                        :cart_isOrdered
-                    )
-                "
+                    "
+                        INSERT INTO carts(
+                            cart_userId,
+                            cart_isOrdered
+                        )
+                        VALUES(
+                            :cart_userId,
+                            :cart_isOrdered
+                        )
+                    "
                 );
                  $queryResult = $statement->execute(array(
                     ":cart_userId" => $_SESSION["current_user"]["id"] ,
@@ -210,16 +248,19 @@
             return $result;
         }
 
+        //
+        // Update cart with given id
+        //
         public function update($request, $response) {
             $cart_id= $request->getAttribute("id");
 
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM carts
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM carts
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $cart_id
@@ -228,12 +269,13 @@
 
                 if ($cart) {
                     $query=  $this->db->prepare(
-                    "   
-                        UPDATE carts 
-                        SET 
-                            cart_isOrdered = :cart_isOrdered
-                        WHERE _id = :_id
-                    ");
+                        "   
+                            UPDATE carts 
+                            SET 
+                                cart_isOrdered = :cart_isOrdered
+                            WHERE _id = :_id
+                        "
+                    );
                     $queryResult= $query->execute(array( 
                         ":_id" => $cart_id,
                         "cart_isOrdered" => $request->getParam("cart_isOrdered")
@@ -276,15 +318,18 @@
             return $result;
         }
 
+        //
+        // Delete cart with given id
+        //
         public function delete($request, $response) {
             $cart_id= $request->getAttribute("id");
             try {
                 $statement = $this->db->prepare(
-                "
-                    SELECT * 
-                    FROM carts
-                    WHERE _id = :_id
-                "
+                    "
+                        SELECT * 
+                        FROM carts
+                        WHERE _id = :_id
+                    "
                 );
                 $statement->execute(array(
                     ":_id" => $cart_id
@@ -295,9 +340,11 @@
 
                     // get all prestations of this cart
                     $statement = $this->db->prepare(
-                    "
-                        SELECT * FROM prestations WHERE prestation_cartId = :prestation_cartId
-                    "
+                        "
+                            SELECT * 
+                            FROM prestations
+                            WHERE prestation_cartId = :prestation_cartId
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":prestation_cartId" => $cart_id
@@ -308,7 +355,8 @@
                     foreach($prestations as $prestations) {
                         $statement = $this->db->prepare(
                         "
-                            DELETE FROM prestation_options WHERE prestation_id = :prestation_id
+                            DELETE FROM prestation_options
+                            WHERE prestation_id = :prestation_id
                         "
                         );
                         $queryResult = $statement->execute(array(
@@ -318,9 +366,10 @@
 
                     // delete prestations related to cart
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM prestations WHERE prestation_cartId = :prestation_cartId
-                    "
+                        "
+                            DELETE FROM prestations
+                            WHERE prestation_cartId = :prestation_cartId
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":prestation_cartId" => $cart_id
@@ -328,9 +377,10 @@
 
                     // delete cart
                     $statement = $this->db->prepare(
-                    "
-                        DELETE FROM carts WHERE _id = :_id
-                    "
+                        "
+                            DELETE FROM carts
+                            WHERE _id = :_id
+                        "
                     );
                     $queryResult = $statement->execute(array(
                         ":_id" => $cart_id
