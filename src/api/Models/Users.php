@@ -101,16 +101,18 @@
                         }
 
                         else {
-                            $cart_id = $cart["_id"];
+                            $cart_id = "";
                         }
                     }
                     $_SESSION["current_user"] = [ 
                         "is_loggedIn" => true,
                         "is_admin" => $user["user_isClient"] == 0,
                         "id" => $user["_id"],
-                        "cart_id" => $cart_id
+                        "first_name" => $user["user_firstname"],
+                        "last_name" => $user["user_lastname"],
                     ];
-                   
+                    $_SESSION["current_user"]["is_admin"] == 0 && $_SESSION["current_user"]["cart_id"] = $cart_id;
+                    $_SESSION["current_user"]["is_admin"] == 0 && $_SESSION["current_user"]["address"] =  $user["user_address"];
                     $data= array_merge(["users"=>$user], $_SESSION);
                     $result = $this->response->withStatus(200)
                     ->withHeader("Content-Type", "application/json")

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run launch:api ; npm run launch:front",
     "show:support": "npx browserslist",
-    "launch:front": "npx cross-env NODE_ENV=development npx webpack && npx webpack-dev-server",
+    "launch:front": "npx cross-env NODE_ENV=development webpack && webpack-dev-server",
     "launch:api": "php -S localhost:3000"
   },
   "author": "Naomi Hauret",
@@ -42,15 +42,23 @@
     "raw-loader": "^0.5.1",
     "style-loader": "^0.19.0",
     "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.9.5"
+    "webpack-cli": "^1.5.2",
+    "webpack-dev-server": "^2.9.7"
   },
   "dependencies": {
+    "@cerebral/forms": "^2.6.0",
+    "@cerebral/http": "^3.6.0",
+    "@cerebral/inferno": "^2.6.0",
+    "@cerebral/router": "^2.6.0",
+    "@cerebral/storage": "^3.4.0",
+    "@cerebral/useragent": "^2.6.0",
     "babel-plugin-inferno": "^3.3.0",
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "browserslist": "^2.9.1",
+    "cerebral": "^3.6.0",
     "inferno": "^3.10.1",
     "inferno-component": "^3.10.1",
-    "inferno-router": "^3.10.1"
+    "inferno-create-element": "^3.10.1"
   }
 }

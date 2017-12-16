@@ -46,9 +46,9 @@
             $app->post('',  \App\Models\Formats::class . ':add')->add($GLOBALS["checkIfAdminStatus"]);  
             $app->group('/{id}', function () use ($app){
                 $app->get('', \App\Models\Formats::class . ':getOne');
-                $app->put('', \App\Models\Formats::class . ':update');
-                $app->delete('', \App\Models\Formats::class . ':delete');            
-            })->add($GLOBALS["checkIfAdminStatus"]);
+                $app->put('', \App\Models\Formats::class . ':update')->add($GLOBALS["checkIfAdminStatus"]);
+                $app->delete('', \App\Models\Formats::class . ':delete')->add($GLOBALS["checkIfAdminStatus"]);            
+            });
         });
 
         // - options
@@ -57,9 +57,9 @@
             $app->post('',  \App\Models\Options::class . ':add')->add($GLOBALS["checkIfAdminStatus"]);  
             $app->group('/{id}', function () use ($app){
                 $app->get('', \App\Models\Options::class . ':getOne');
-                $app->put('', \App\Models\Options::class . ':update');
-                $app->delete('', \App\Models\Options::class . ':delete');            
-            })->add($GLOBALS["checkIfAdminStatus"]);
+                $app->put('', \App\Models\Options::class . ':update')->add($GLOBALS["checkIfAdminStatus"]);
+                $app->delete('', \App\Models\Options::class . ':delete')->add($GLOBALS["checkIfAdminStatus"]);         
+            });
         });
 
         // - prestations
