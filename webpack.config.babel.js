@@ -1,5 +1,6 @@
 import path from "path"
 import HtmlWebpackPlugin from 'html-webpack-plugin'
+import webpack from 'webpack'
 
 const exludedFolders = [
   path.join(__dirname, "node_modules"),
@@ -18,21 +19,24 @@ module.exports = {
     compress: true,
     port: 9000,
     historyApiFallback: true,
-    open: true,
+    open: true
   },
   module: {
-      rules: [
-        {
-            test: /\.js$/,
-            exclude: exludedFolders,
-            use: "babel-loader",
-        }
-      ]
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: exludedFolders,
+        use: "babel-loader"
+      }
+    ]
   },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: "./src/front/index.html",
-            filename: "index.html",
-        })
-    ],
-}
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify("development")
+    }),
+    new HtmlWebpackPlugin({
+      template: "./src/front/index.html",
+      filename: "index.html"
+    })
+  ]
+};

@@ -5,9 +5,9 @@ import { state, signal } from 'cerebral/tags'
 import FormatChoice from './../FormatChoice'
 
 export default connect({
-    chosenFormat: state`newPrestationForm.format.id`,
-    formats: state`formats`,
     setChosenFormat: signal`userChoseFormat`,
+    chosenFormat: state`prestationForm.format.id`,
+    formats: state`formats`,
 },
     function FormatsList ({chosenFormat, formats, setChosenFormat}) {
             if (formats.isLoading) return <h1>Loading</h1>

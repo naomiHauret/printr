@@ -7,14 +7,18 @@ import Router from '@cerebral/router'
 const router = Router({
   routes: [
     {
-      path: '/',
-      signal: 'homeRouted' 
+      path: "/",
+      signal: "homeRouted"
     },
     {
-        path: '/editor',
-        signal: 'editorRouted'
+      path: "/editor",
+      signal: "editorAddPrestationRouted"
+    },
+    {
+      path: "/editor/:id",
+      signal: "editorEditPrestationRouted"
     }
   ]
-})
+});
 
 export default router

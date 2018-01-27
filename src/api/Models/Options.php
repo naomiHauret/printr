@@ -14,12 +14,29 @@
             try {
                 $statement = $this->db->prepare(
                     "
-                        SELECT * 
+                        SELECT option_category
                         FROM options
+                        GROUP BY option_category 
                     "
                 );
                 $statement->execute();
-                $options = $statement->fetchAll();
+                $optionsCategories = $statement->fetchAll();
+                $options= [];
+                for ($i = 0; $i < count($optionsCategories); $i++) {
+                    $category= $optionsCategories[$i]["option_category"];
+                    $statement = $this->db->prepare(
+                        "
+                            SELECT options._id, options.option_name, options.option_price
+                            FROM options
+                            WHERE options.option_category = :option_category
+                        "
+                    );
+                    $statement->execute(array(
+                        ":option_category" =>  $category
+                    ));
+                    $matchingOptions = $statement->fetchAll();
+                     $options[$i]= ["category" => $category, "choices" => $matchingOptions];
+                }
                 $data= array_merge(["options"=> $options], $_SESSION);
                 $result= $this->response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
@@ -109,22 +126,19 @@
                         INSERT INTO options(
                             option_name,
                             option_price,
-                            option_category,
-                            option_isAvailable
+                            option_category
                         )
                         VALUES(
                             :option_name,
                             :option_price,
-                            :option_category,
-                            :option_isAvailable
+                            :option_category
                         )
                     "
                 );
                  $queryResult = $statement->execute(array(
                     ":option_name" => $request->getParam("option_name"),
                     ":option_price" => $request->getParam("option_price"),
-                    ":option_category" => $request->getParam("option_category"),
-                    ":option_isAvailable" => $request->getParam("option_isAvailable")
+                    ":option_category" => $request->getParam("option_category")
                 ));
 
                 $data= array_merge(["added"=> $queryResult], $_SESSION);
@@ -176,8 +190,7 @@
                             SET 
                                     option_name = :option_name,
                                     option_price = :option_price,
-                                    option_category = :option_category,
-                                    option_isAvailable = :option_isAvailable
+                                    option_category = :option_category
                             WHERE _id = :_id
                         "
                     );
@@ -185,7 +198,6 @@
                         "option_name" => $request->getParam("option_name") ,
                         "option_price" => $request->getParam("option_price"),
                         "option_category" => $request->getParam("option_category"),
-                        "option_isAvailable" => $request->getParam("option_isAvailable"),
                         "_id" => $option_id
                     ));
 

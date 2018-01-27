@@ -1,7 +1,7 @@
 import Inferno from 'inferno'
 
 const FileLoader = (props) => {
-    const { imgUrl, onChange, error } = props
+    const { imgUrl, onChange, error, value } = props
     return <label>
         <div style={
             `
@@ -16,6 +16,8 @@ const FileLoader = (props) => {
                 type="file"
                 accept="svg|png|pdf"
                 onChange={onChange}
+                value={value}
+                required
             />
         </div>
         <small>Accepted formats: SVG, PNG, PDF.</small>

@@ -11,9 +11,8 @@ export default connect({
     triggerLogout: signal`logUserOut`,
     handleEmailChange: signal`inputEmailValue`,
     handlePasswordChange: signal`inputPasswordValue`,
-    removeByeMessage: signal`removeByeMessage`,
 },
-    function UserGate({ user, triggerLogin, triggerLogout, handleEmailChange, handlePasswordChange, removeByeMessage}) {
+    function UserGate({ user, triggerLogin, triggerLogout, handleEmailChange, handlePasswordChange}) {
 
         if (user.info){
             let currentUserName = user.info.first_name
@@ -22,24 +21,19 @@ export default connect({
                 : `Nice to see you again ${currentUserName} !`
             return <div>
                 <span>
-                    { !user.isLoadingData && welcomeMessage}
+                    {!user.isLoadingData && user.displayWelcomeMessage && welcomeMessage}
                     <LoadingButton
                         label={user.error ? "Try again" : "Logout"}
                         isDisabled={false}
                         isLoadingData={user.isLoadingData}
-                        onClick={
-                            () => {
-                                triggerLogout()
-                                setTimeout(removeByeMessage, 4000)
-                            }
-                        }
+                        onClick={triggerLogout}
                     />
                 </span>
             </div>
         }
         return <div>
             {
-                user.hasLoggedOut && <div>
+                user.displayByeMessage && <div>
                     See you, {user.tmpName} !
                 </div>
             }
