@@ -77,13 +77,14 @@ export default Module({
     // Routes
     //
     homeRouted: changePage("home", [prestationFormActions.loadFormats]),
-    editorAddPrestationRouted: changePage("editor", [
+    editorEditPrestationRouted: changePage("editor/:id", [
       parallel([
         prestationFormActions.loadFormats,
         prestationFormActions.loadOptions
       ])
     ]),
-    editorEditPrestationRouted: changePage("editor/:id", [
+
+    editorAddPrestationRouted: changePage("editor", [
       parallel([
         prestationFormActions.loadFormats,
         prestationFormActions.loadOptions

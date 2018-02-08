@@ -4,11 +4,13 @@ import UserGate from './../components/UserGate'
 import PrestationEditor from './../components/PrestationEditor'
 
 const EditPrestation = () => (
-  <div>
-    <h1>Editor</h1>
-    <UserGate />
+  <header>
+    <div className="flex justify-between items-center px-2 bg-white border-b-1 border-grey-light h-24">
+      <h1 data-content="Rest In Print">Rest in Print</h1>
+      <UserGate />
+    </div>
     <PrestationEditor />
-  </div>
+  </header>
 );
 
 export default EditPrestation

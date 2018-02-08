@@ -72,6 +72,7 @@ export function toggleOption({ state, props }) {
                 :   state.set(`prestationForm.options.list.${indexOptions}.choices.${indexChoices}.checked`, true)
 
                 state.set(`prestationForm.options.list.${indexOptions}.chosen`, true)
+                state.set(`prestationForm.options.list.${indexOptions}.changed`, true)
             })
         }
 

@@ -1,0 +1,18 @@
+:root {
+	--bg-color: rgb(255, 255, 255);
+	--dot-color: rgb(230, 230, 230);
+	--dot-size: 2px;
+	--dot-space: 16px;
+	--headerSize: 6rem;
+	--buttonSize: 4rem;
+	--layoutSize: calc( var(--buttonSize) + var(--headerSize));
+}
+
+.inEditorMaxHeight {
+    max-height: calc(100vh - var(--layoutSize)); /* 6rem equals header + button size */
+}
+
+.bgDots {
+  background: linear-gradient(90deg, var(--bg-color) calc(var(--dot-space)-var(--dot-size)), transparent 1%) center, linear-gradient(var(--bg-color) calc(var(--dot-space)-var(--dot-size)), transparent 1%) center, var(--dot-color);
+  background-size: var(--dot-space) var(--dot-space);
+}

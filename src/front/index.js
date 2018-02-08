@@ -1,5 +1,6 @@
 import 'babel-polyfill'
 import Inferno from 'inferno'
+import "./css/main.css"
 
 // Router related
 import Routes from './js/routes'

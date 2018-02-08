@@ -8,14 +8,13 @@ import {state} from 'cerebral/tags'
 
 // pages
 import Home from './../pages/Home'
-import AddPrestation from '../pages/AddPrestation';
-import EditPrestation from '../pages/EditPrestation';
+import AddPrestation from './../pages/AddPrestation'
+import EditPrestation from './../pages/EditPrestation'
 
 const pages = {
   home: Home,
-  editorAddPrestation: AddPrestation,
-  editorEditPrestationRouted: EditPrestation,
-};
+  editor: AddPrestation,
+}
 
 export default connect({
   currentPage: state`currentPage`
